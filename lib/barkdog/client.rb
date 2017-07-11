@@ -40,6 +40,16 @@ class Barkdog::Client
     expected.each do |name, expected_monitor|
       actual_monitor = actual.delete(name)
 
+      if @options[:monitor_tags]
+        # make sure the tags from the command line are included when creating
+        # a monitor ... regardless of what the apply file says.
+        if not expected_monitor['tags']
+          expected_monitor['tags'] = []
+        end
+        expected_monitor['tags'] << @options[:monitor_tags]
+        expected_monitor['tags'].uniq!
+      end
+
       if actual_monitor
         updated = walk_monitor(name, expected_monitor, actual_monitor) || updated
       else
